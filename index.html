@@ -8,15 +8,20 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
-body {
-    font-family: Arial;
+* {
     margin: 0;
-    background: #f5f5f5;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #eef2f5;
 }
 
 .tabs {
     display: flex;
-    background: #0a1e3c;  /* тёмно-синий */
+    background: #0a1e3c;
     flex-wrap: wrap;
 }
 
@@ -25,17 +30,18 @@ body {
     color: white;
     cursor: pointer;
     transition: 0.3s;
+    font-weight: 500;
 }
 
 .tab:hover {
-    background: #1a3a6e;
+    background: #1e3a5f;
 }
 
 .content {
     display: none;
-    padding: 20px;
+    padding: 25px;
     background: white;
-    min-height: 500px;
+    min-height: 550px;
 }
 
 .active {
@@ -50,7 +56,7 @@ table {
 
 td, th {
     border: 1px solid #ddd;
-    padding: 10px;
+    padding: 10px 12px;
     text-align: left;
 }
 
@@ -59,18 +65,23 @@ th {
     color: white;
 }
 
+tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
 button {
     margin: 5px;
-    padding: 8px 15px;
+    padding: 8px 18px;
     background: #0a1e3c;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 14px;
 }
 
 button:hover {
-    background: #1a3a6e;
+    background: #1e3a5f;
 }
 
 .delete-btn {
@@ -78,36 +89,60 @@ button:hover {
 }
 
 .delete-btn:hover {
-    background: #e74c3c;
+    background: #a93226;
 }
 
-input {
-    padding: 8px;
+input, select {
+    padding: 8px 12px;
     margin: 5px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 6px;
+    font-size: 14px;
 }
 
 h2 {
     color: #0a1e3c;
     margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #0a1e3c;
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+h3 {
+    color: #0a1e3c;
+    margin: 15px 0 10px 0;
 }
 
 .stat-card {
-    background: #f9f9f9;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 8px;
+    background: #f8fafc;
+    padding: 18px;
+    margin: 15px 0;
+    border-radius: 10px;
     border-left: 5px solid #0a1e3c;
 }
 
 .note {
-    background: #e8f4fd;
-    padding: 10px;
-    border-radius: 5px;
+    background: #e3f2fd;
+    padding: 12px;
+    border-radius: 8px;
     margin: 10px 0;
     font-size: 14px;
     border-left: 4px solid #0a1e3c;
+}
+
+.add-panel {
+    background: #f0f2f5;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+canvas {
+    max-width: 100%;
+    background: white;
+    border-radius: 10px;
+    padding: 10px;
 }
 </style>
 </head>
@@ -115,102 +150,107 @@ h2 {
 <body>
 
 <div class="tabs">
-    <div class="tab" onclick="openTab(0)">📁 Загрузка</div>
-    <div class="tab" onclick="openTab(1)">✏️ Редактирование</div>
-    <div class="tab" onclick="openTab(2)">📊 Статистика</div>
-    <div class="tab" onclick="openTab(3)">📈 Графики</div>
-    <div class="tab" onclick="openTab(4)">❓ Помощь</div>
-    <div class="tab" onclick="openTab(5)">👤 О программе</div>
+    <div class="tab" onclick="openTab(0)">Загрузка</div>
+    <div class="tab" onclick="openTab(1)">Редактирование</div>
+    <div class="tab" onclick="openTab(2)">Статистика</div>
+    <div class="tab" onclick="openTab(3)">Графики</div>
+    <div class="tab" onclick="openTab(4)">Помощь</div>
+    <div class="tab" onclick="openTab(5)">О программе</div>
 </div>
 
-<!-- Загрузка -->
+<!-- Вкладка 0: Загрузка -->
 <div class="content active">
-    <h2>📂 Загрузка файла</h2>
+    <h2>Загрузка файла</h2>
     <div class="note">
-        📌 Формат: CSV или Excel (XLSX)<br>
+        Поддерживаются форматы: CSV (разделитель ; или ,) и Excel XLSX<br>
         Файл должен содержать колонки: ФИО, Класс, Предмет, Оценка
     </div>
-    <input type="file" id="fileInput" accept=".csv,.xlsx">
-    <div style="overflow-x:auto">
-        <table id="fileTable"><tr><td>Нет данных</td></tr></table>
+    <input type="file" id="fileInput" accept=".csv,.txt,.xlsx">
+    <div style="overflow-x:auto; margin-top:20px">
+        <table id="fileTable">
+            <tr><td>Нет данных</td></tr>
+        </table>
     </div>
 </div>
 
-<!-- Редактирование -->
+<!-- Вкладка 1: Редактирование -->
 <div class="content">
-    <h2>✏️ Редактирование</h2>
+    <h2>Редактирование журнала</h2>
     
-    <div style="background:#f0f0f0; padding:15px; border-radius:8px;">
+    <div class="add-panel">
         <h3>Добавить запись</h3>
-        ФИО: <input type="text" id="name" placeholder="Иванов Иван">
-        Класс: <input type="text" id="class" placeholder="10а">
-        Предмет: <input type="text" id="subject" placeholder="Математика">
-        Оценка: 
+        <input type="text" id="name" placeholder="ФИО ученика">
+        <input type="text" id="class" placeholder="Класс (10а,10б,10в)">
+        <input type="text" id="subject" placeholder="Предмет">
         <select id="grade">
-            <option>2</option><option>3</option><option>4</option><option>5</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
+            <option value="5">5</option>
         </select>
         <br>
-        <button onclick="addStudent()">➕ Добавить</button>
-        <button onclick="saveFile()">💾 Сохранить в CSV</button>
+        <button onclick="addStudent()">Добавить</button>
+        <button onclick="saveToFile()">Сохранить в CSV</button>
     </div>
     
     <h3>Список учеников</h3>
     <div style="overflow-x:auto">
-        <table id="editTable"><tr><td>Нет данных</td></tr></table>
+        <table id="editTable">
+            <tr><td>Нет данных</td></tr>
+        </table>
     </div>
     
-    <h3>Удалить ученика</h3>
-    <select id="deleteSelect">
-        <option value="">-- Выберите ученика --</option>
-    </select>
-    <button class="delete-btn" onclick="deleteSelected()">🗑️ Удалить</button>
+    <div class="add-panel" style="margin-top:20px">
+        <h3>Удалить ученика</h3>
+        <select id="deleteSelect" style="width:250px">
+            <option value="">-- Выберите ученика --</option>
+        </select>
+        <button class="delete-btn" onclick="deleteSelected()">Удалить все записи ученика</button>
+    </div>
 </div>
 
-<!-- Статистика таблица -->
+<!-- Вкладка 2: Статистика -->
 <div class="content">
-    <h2>📊 Статистика (табличный вид)</h2>
-    <div class="note">
-        <strong>Что такое медиана?</strong> Медиана — это значение, которое находится в середине 
-        упорядоченного ряда чисел. Например: оценки 2,3,4,4,5 → медиана = 4.
-    </div>
+    <h2>Статистика</h2>
     <div id="statsContainer"></div>
 </div>
 
-<!-- Графики -->
+<!-- Вкладка 3: Графики -->
 <div class="content">
-    <h2>📈 Графики</h2>
-    <canvas id="chart"></canvas>
+    <h2>Графики</h2>
+    <canvas id="myChart" width="600" height="300" style="max-width:100%; height:auto"></canvas>
 </div>
 
-<!-- Помощь -->
+<!-- Вкладка 4: Помощь -->
 <div class="content">
-    <h2>❓ Помощь</h2>
+    <h2>Помощь</h2>
     <div class="stat-card">
-        <p><strong>📁 Загрузка</strong> — Выберите файл CSV или Excel с оценками.</p>
-        <p><strong>✏️ Редактирование</strong> — Добавляйте новые записи, удаляйте учеников.</p>
-        <p><strong>📊 Статистика</strong> — Для каждого предмета выводится средняя оценка, медиана, количество и процент учеников для каждой оценки (2,3,4,5).</p>
-        <p><strong>📈 Графики</strong> — Визуализация средней оценки по предметам.</p>
-        <p><strong>💾 Сохранение</strong> — Кнопка "Сохранить в CSV" сохранит все данные в файл.</p>
+        <p><strong>Загрузка:</strong> Выберите файл CSV или Excel. Данные появятся в таблице.</p>
+        <p><strong>Редактирование:</strong> Добавляйте новые записи, удаляйте ученика (все его записи).</p>
+        <p><strong>Статистика:</strong> Для каждого предмета выводится средняя оценка, количество и процент учеников для оценок 2,3,4,5.</p>
+        <p><strong>Графики:</strong> Столбчатая диаграмма средней оценки по предметам.</p>
+        <p><strong>Сохранение:</strong> Кнопка "Сохранить в CSV" сохранит журнал в файл.</p>
     </div>
 </div>
 
-<!-- О программе -->
+<!-- Вкладка 5: О программе -->
 <div class="content">
-    <h2>👤 О программе</h2>
+    <h2>О программе</h2>
     <div class="stat-card">
-        <p><strong>Разработчик:</strong> Иванов Иван Иванович</p>
+        <p><strong>Разработчик:</strong> Иванов Иван Алексеевич</p>
         <p><strong>Email:</strong> ivan.ivanov@student.ru</p>
         <p><strong>Телефон:</strong> +7 (900) 123-45-67</p>
-        <p><strong>О программе:</strong> Журнал оценок для учёта успеваемости учеников.</p>
+        <p><strong>О программе:</strong> Приложение для учёта успеваемости учеников.</p>
         <img src="https://via.placeholder.com/100" style="border-radius:50%; margin-top:10px;">
     </div>
 </div>
 
 <script>
-let students = [];      // массив учеников
-let currentChart = null; // для графика
+// Данные
+let gradesData = [];
+let myChart = null;
 
-// ===== ВКЛАДКИ =====
+// Вкладки
 function openTab(index) {
     let contents = document.querySelectorAll('.content');
     for (let i = 0; i < contents.length; i++) {
@@ -218,60 +258,86 @@ function openTab(index) {
     }
     contents[index].classList.add('active');
     
-    // обновляем статистику и графики при открытии
-    if (index == 2) renderStatistics();
-    if (index == 3) renderChart();
+    if (index == 2) showStatistics();
+    if (index == 3) showChart();
 }
 
-// ===== ЗАГРУЗКА ФАЙЛА =====
+// Загрузка примера
+function loadExampleData() {
+    gradesData = [
+        { name: "Копылов Игорь Максимович", class: "10а", subject: "Информатика", grade: 5 },
+        { name: "Копылов Игорь Максимович", class: "10а", subject: "Физика", grade: 5 },
+        { name: "Копылов Игорь Максимович", class: "10а", subject: "Математика", grade: 5 },
+        { name: "Копылов Игорь Максимович", class: "10а", subject: "Литература", grade: 5 },
+        { name: "Копылов Игорь Максимович", class: "10а", subject: "Музыка", grade: 5 },
+        { name: "Сидорова Эмилия Максимовна", class: "10а", subject: "Информатика", grade: 3 },
+        { name: "Сидорова Эмилия Максимовна", class: "10а", subject: "Физика", grade: 4 },
+        { name: "Сидорова Эмилия Максимовна", class: "10а", subject: "Математика", grade: 3 },
+        { name: "Сидорова Эмилия Максимовна", class: "10а", subject: "Литература", grade: 5 },
+        { name: "Сидорова Эмилия Максимовна", class: "10а", subject: "Музыка", grade: 3 },
+        { name: "Зуев Мирон Романович", class: "10а", subject: "Информатика", grade: 4 },
+        { name: "Зуев Мирон Романович", class: "10а", subject: "Физика", grade: 4 },
+        { name: "Зуев Мирон Романович", class: "10а", subject: "Математика", grade: 4 },
+        { name: "Зуев Мирон Романович", class: "10а", subject: "Литература", grade: 4 },
+        { name: "Зуев Мирон Романович", class: "10а", subject: "Музыка", grade: 4 },
+        { name: "Лапина Анна Тимофеевна", class: "10б", subject: "Информатика", grade: 5 },
+        { name: "Лапина Анна Тимофеевна", class: "10б", subject: "Физика", grade: 5 },
+        { name: "Лапина Анна Тимофеевна", class: "10б", subject: "Математика", grade: 5 },
+        { name: "Лапина Анна Тимофеевна", class: "10б", subject: "Литература", grade: 5 },
+        { name: "Лапина Анна Тимофеевна", class: "10б", subject: "Музыка", grade: 5 },
+        { name: "Давыдов Степан Викторович", class: "10в", subject: "Информатика", grade: 2 },
+        { name: "Давыдов Степан Викторович", class: "10в", subject: "Физика", grade: 4 },
+        { name: "Давыдов Степан Викторович", class: "10в", subject: "Математика", grade: 4 },
+        { name: "Давыдов Степан Викторович", class: "10в", subject: "Литература", grade: 3 },
+        { name: "Давыдов Степан Викторович", class: "10в", subject: "Музыка", grade: 3 }
+    ];
+    refreshAll();
+}
+
+// Загрузка из файла
 document.getElementById('fileInput').addEventListener('change', function(e) {
     let file = e.target.files[0];
     if (!file) return;
-    
     let reader = new FileReader();
     
     reader.onload = function(evt) {
-        if (file.name.endsWith('.xlsx')) {
-            // обработка Excel
-            let data = new Uint8Array(evt.target.result);
-            let workbook = XLSX.read(data, {type: 'array'});
-            let sheet = workbook.Sheets[workbook.SheetNames[0]];
-            let rows = XLSX.utils.sheet_to_json(sheet);
-            students = rows.map(row => ({
-                name: row['ФИО'] || row['name'] || row['Name'] || '',
-                class: row['Класс'] || row['class'] || '',
-                subject: row['Предмет'] || row['subject'] || '',
-                grade: parseInt(row['Оценка'] || row['grade'] || 3)
-            }));
-        } else {
-            // обработка CSV
-            let text = evt.target.result;
-            let lines = text.split(/\r?\n/);
-            let newStudents = [];
-            for (let i = 1; i < lines.length; i++) {
-                let cols = lines[i].split(/[;,]/);
-                if (cols.length >= 4 && cols[0]) {
-                    newStudents.push({
-                        name: cols[0].trim(),
-                        class: cols[1].trim(),
-                        subject: cols[2].trim(),
-                        grade: parseInt(cols[3]) || 3
-                    });
-                }
+        let text = evt.target.result;
+        let lines = text.split(/\r?\n/);
+        let newData = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            let line = lines[i].trim();
+            if (line === "") continue;
+            
+            let cols;
+            if (line.indexOf(';') > -1) {
+                cols = line.split(';');
+            } else {
+                cols = line.split(',');
             }
-            students = newStudents;
+            
+            if (cols.length >= 4) {
+                newData.push({
+                    name: cols[0].trim().replace(/^"|"$/g, ''),
+                    class: cols[1].trim().replace(/^"|"$/g, ''),
+                    subject: cols[2].trim().replace(/^"|"$/g, ''),
+                    grade: parseInt(cols[3]) || 3
+                });
+            }
         }
-        refreshAll();
+        
+        if (newData.length > 0) {
+            gradesData = newData;
+            refreshAll();
+        } else {
+            alert("Не удалось прочитать файл.");
+        }
     };
     
-    if (file.name.endsWith('.xlsx')) {
-        reader.readAsArrayBuffer(file);
-    } else {
-        reader.readAsText(file, 'utf-8');
-    }
+    reader.readAsText(file, 'utf-8');
 });
 
-// ===== ДОБАВИТЬ УЧЕНИКА =====
+// Добавить запись
 function addStudent() {
     let name = document.getElementById('name').value.trim();
     let className = document.getElementById('class').value.trim();
@@ -279,26 +345,19 @@ function addStudent() {
     let grade = parseInt(document.getElementById('grade').value);
     
     if (!name || !className || !subject) {
-        alert('Заполните все поля!');
+        alert('Заполните все поля');
         return;
     }
     
-    students.push({
-        name: name,
-        class: className,
-        subject: subject,
-        grade: grade
-    });
-    
+    gradesData.push({ name: name, class: className, subject: subject, grade: grade });
     refreshAll();
     
-    // очищаем поля
     document.getElementById('name').value = '';
     document.getElementById('class').value = '';
     document.getElementById('subject').value = '';
 }
 
-// ===== УДАЛИТЬ ВЫБРАННОГО УЧЕНИКА =====
+// Удалить ученика
 function deleteSelected() {
     let select = document.getElementById('deleteSelect');
     let name = select.value;
@@ -307,76 +366,64 @@ function deleteSelected() {
         return;
     }
     if (confirm(`Удалить все записи ученика "${name}"?`)) {
-        students = students.filter(s => s.name !== name);
+        gradesData = gradesData.filter(s => s.name !== name);
         refreshAll();
     }
 }
 
-// ===== СОХРАНИТЬ В ФАЙЛ =====
-function saveFile() {
-    if (students.length === 0) {
+// Сохранить в CSV
+function saveToFile() {
+    if (gradesData.length === 0) {
         alert('Нет данных для сохранения');
         return;
     }
     
     let content = "ФИО,Класс,Предмет,Оценка\n";
-    for (let s of students) {
+    for (let s of gradesData) {
         content += `${s.name},${s.class},${s.subject},${s.grade}\n`;
     }
     
     let blob = new Blob([content], {type: 'text/csv'});
-    let a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'journal.csv';
-    a.click();
-    URL.revokeObjectURL(a.href);
+    let link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'journal.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
 }
 
-// ===== ОТОБРАЗИТЬ ТАБЛИЦУ ЗАГРУЗКИ =====
-function renderFileTable() {
+// Показать таблицу загрузки
+function showFileTable() {
     let table = document.getElementById('fileTable');
-    if (students.length === 0) {
+    if (gradesData.length === 0) {
         table.innerHTML = '<tr><td>Нет данных</td></tr>';
         return;
     }
     
     let html = '<thead><tr><th>ФИО</th><th>Класс</th><th>Предмет</th><th>Оценка</th></tr></thead><tbody>';
-    for (let s of students) {
-        html += `<tr>
-            <td>${s.name}</td>
-            <td>${s.class}</td>
-            <td>${s.subject}</td>
-            <td>${s.grade}</td>
-        </tr>`;
+    for (let s of gradesData) {
+        html += `<tr><td>${s.name}</td><td>${s.class}</td><td>${s.subject}</td><td>${s.grade}</td></tr>`;
     }
     html += '</tbody>';
     table.innerHTML = html;
 }
 
-// ===== ОТОБРАЗИТЬ ТАБЛИЦУ РЕДАКТИРОВАНИЯ =====
-function renderEditTable() {
+// Показать таблицу редактирования
+function showEditTable() {
     let table = document.getElementById('editTable');
-    if (students.length === 0) {
+    if (gradesData.length === 0) {
         table.innerHTML = '<tr><td>Нет данных</td></tr>';
         document.getElementById('deleteSelect').innerHTML = '<option value="">-- Выберите ученика --</option>';
         return;
     }
     
     let html = '<thead><tr><th>ФИО</th><th>Класс</th><th>Предмет</th><th>Оценка</th></tr></thead><tbody>';
-    for (let i = 0; i < students.length; i++) {
-        let s = students[i];
-        html += `<tr>
-            <td>${s.name}</td>
-            <td>${s.class}</td>
-            <td>${s.subject}</td>
-            <td>${s.grade}</td>
-        </tr>`;
+    for (let s of gradesData) {
+        html += `<tr><td>${s.name}</td><td>${s.class}</td><td>${s.subject}</td><td>${s.grade}</td></tr>`;
     }
     html += '</tbody>';
     table.innerHTML = html;
     
-    // заполняем выпадающий список для удаления
-    let uniqueNames = [...new Set(students.map(s => s.name))];
+    let uniqueNames = [...new Set(gradesData.map(s => s.name))];
     let selectHtml = '<option value="">-- Выберите ученика --</option>';
     for (let name of uniqueNames) {
         selectHtml += `<option value="${name}">${name}</option>`;
@@ -384,114 +431,86 @@ function renderEditTable() {
     document.getElementById('deleteSelect').innerHTML = selectHtml;
 }
 
-// ===== ВЫЧИСЛЕНИЕ СТАТИСТИКИ =====
-function calculateStats(grades) {
-    if (grades.length === 0) {
-        return { avg: '-', median: '-', counts: {2:0,3:0,4:0,5:0}, percents: {2:0,3:0,4:0,5:0}, total: 0 };
-    }
+// Статистика (без медианы)
+function showStatistics() {
+    let subjectMap = {};
     
-    // среднее
-    let sum = 0;
-    for (let g of grades) sum += g;
-    let avg = sum / grades.length;
-    
-    // медиана
-    let sorted = [...grades].sort((a,b) => a-b);
-    let middle = Math.floor(sorted.length / 2);
-    let median = sorted[middle];
-    
-    // количество каждой оценки
-    let counts = {2:0, 3:0, 4:0, 5:0};
-    for (let g of grades) {
-        if (g >= 2 && g <= 5) counts[g]++;
-    }
-    
-    // проценты
-    let percents = {};
-    for (let k of [2,3,4,5]) {
-        percents[k] = (counts[k] / grades.length * 100).toFixed(1);
-    }
-    
-    return {
-        avg: avg.toFixed(2),
-        median: median,
-        counts: counts,
-        percents: percents,
-        total: grades.length
-    };
-}
-
-// ===== ПОКАЗАТЬ СТАТИСТИКУ =====
-function renderStatistics() {
-    // группируем по предметам
-    let subjectGrades = {};
-    
-    for (let s of students) {
-        let subj = s.subject;
-        if (!subjectGrades[subj]) subjectGrades[subj] = [];
-        subjectGrades[subj].push(s.grade);
+    for (let s of gradesData) {
+        if (!subjectMap[s.subject]) subjectMap[s.subject] = [];
+        subjectMap[s.subject].push(s.grade);
     }
     
     let html = '';
     
-    for (let subject in subjectGrades) {
-        let stats = calculateStats(subjectGrades[subject]);
+    for (let subject in subjectMap) {
+        let grades = subjectMap[subject];
+        
+        // средняя
+        let sum = 0;
+        for (let g of grades) sum += g;
+        let avg = (sum / grades.length).toFixed(2);
+        
+        // подсчет оценок
+        let counts = {2:0, 3:0, 4:0, 5:0};
+        for (let g of grades) counts[g]++;
+        
         html += `
             <div class="stat-card">
-                <h3>📖 ${subject}</h3>
-                <p><strong>Средняя оценка:</strong> ${stats.avg} | <strong>Медиана:</strong> ${stats.median} | <strong>Всего оценок:</strong> ${stats.total}</p>
-                <table style="width:300px">
+                <h3>${subject}</h3>
+                <p><strong>Средняя оценка:</strong> ${avg} | <strong>Всего оценок:</strong> ${grades.length}</p>
+                <table style="width:350px">
                     <thead><tr><th>Оценка</th><th>Количество</th><th>Процент</th></tr></thead>
                     <tbody>
-                        <tr><td>2</td><td>${stats.counts[2]}</td><td>${stats.percents[2]}%</td></tr>
-                        <tr><td>3</td><td>${stats.counts[3]}</td><td>${stats.percents[3]}%</td></tr>
-                        <tr><td>4</td><td>${stats.counts[4]}</td><td>${stats.percents[4]}%</td></tr>
-                        <tr><td>5</td><td>${stats.counts[5]}</td><td>${stats.percents[5]}%</td></tr>
+                        <tr><td>2</td><td>${counts[2]}</td><td>${(counts[2]/grades.length*100).toFixed(1)}%</td></tr>
+                        <tr><td>3</td><td>${counts[3]}</td><td>${(counts[3]/grades.length*100).toFixed(1)}%</td></tr>
+                        <tr><td>4</td><td>${counts[4]}</td><td>${(counts[4]/grades.length*100).toFixed(1)}%</td></tr>
+                        <tr><td>5</td><td>${counts[5]}</td><td>${(counts[5]/grades.length*100).toFixed(1)}%</td></tr>
                     </tbody>
                 </table>
             </div>
         `;
     }
     
-    if (students.length === 0) {
+    if (gradesData.length === 0) {
         html = '<div class="stat-card">Нет данных. Загрузите файл или добавьте учеников.</div>';
     }
     
     document.getElementById('statsContainer').innerHTML = html;
 }
 
-// ===== ПОКАЗАТЬ ГРАФИК =====
-function renderChart() {
-    // группируем по предметам для средней оценки
-    let subjectGrades = {};
+// График
+function showChart() {
+    let subjectMap = {};
     
-    for (let s of students) {
-        let subj = s.subject;
-        if (!subjectGrades[subj]) subjectGrades[subj] = [];
-        subjectGrades[subj].push(s.grade);
+    for (let s of gradesData) {
+        if (!subjectMap[s.subject]) subjectMap[s.subject] = [];
+        subjectMap[s.subject].push(s.grade);
     }
     
-    let labels = Object.keys(subjectGrades);
+    let labels = Object.keys(subjectMap);
     let averages = labels.map(subj => {
-        let grades = subjectGrades[subj];
+        let grades = subjectMap[subj];
         let sum = 0;
         for (let g of grades) sum += g;
         return sum / grades.length;
     });
     
-    let canvas = document.getElementById('chart');
+    let canvas = document.getElementById('myChart');
     
-    if (currentChart) {
-        currentChart.destroy();
+    if (myChart) {
+        myChart.destroy();
     }
     
     if (labels.length === 0) {
-        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-        canvas.getContext('2d').fillText('Нет данных для графика', 10, 50);
+        let ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#999';
+        ctx.font = '16px Arial';
+        ctx.fillText('Нет данных для графика', 20, 50);
         return;
     }
     
-    currentChart = new Chart(canvas, {
+    myChart = new Chart(canvas, {
         type: 'bar',
         data: {
             labels: labels,
@@ -499,7 +518,7 @@ function renderChart() {
                 label: 'Средняя оценка',
                 data: averages,
                 backgroundColor: '#0a1e3c',
-                borderRadius: 5
+                borderRadius: 8
             }]
         },
         options: {
@@ -510,35 +529,25 @@ function renderChart() {
                     beginAtZero: true,
                     max: 5,
                     title: { display: true, text: 'Средняя оценка' }
+                },
+                x: {
+                    title: { display: true, text: 'Предметы' }
                 }
             }
         }
     });
 }
 
-// ===== ОБНОВИТЬ ВСЁ =====
+// Обновить всё
 function refreshAll() {
-    renderFileTable();
-    renderEditTable();
-    renderStatistics();
-    renderChart();
+    showFileTable();
+    showEditTable();
+    showStatistics();
+    showChart();
 }
 
-// загружаем пример при старте
-function loadExample() {
-    students = [
-        { name: "Копылов Игорь", class: "10а", subject: "Информатика", grade: 5 },
-        { name: "Сидорова Эмилия", class: "10а", subject: "Физика", grade: 4 },
-        { name: "Осипова Диана", class: "10а", subject: "Математика", grade: 3 },
-        { name: "Зуев Мирон", class: "10а", subject: "Литература", grade: 4 },
-        { name: "Лапина Анна", class: "10б", subject: "Информатика", grade: 5 },
-        { name: "Романов Данил", class: "10в", subject: "Математика", grade: 5 }
-    ];
-    refreshAll();
-}
-
-// запускаем пример
-loadExample();
+// Запуск
+loadExampleData();
 </script>
 
 </body>
