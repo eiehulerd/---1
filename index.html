@@ -115,17 +115,17 @@ h2 {
 <body>
 
 <div class="tabs">
-    <div class="tab" onclick="openTab(0)"> Загрузка</div>
-    <div class="tab" onclick="openTab(1)"> Редактирование</div>
-    <div class="tab" onclick="openTab(2)"> Статистика</div>
-    <div class="tab" onclick="openTab(3)"> Графики</div>
-    <div class="tab" onclick="openTab(4)"> Помощь</div>
-    <div class="tab" onclick="openTab(5)"> О программе</div>
+    <div class="tab" onclick="openTab(0)">📁 Загрузка</div>
+    <div class="tab" onclick="openTab(1)">✏️ Редактирование</div>
+    <div class="tab" onclick="openTab(2)">📊 Статистика</div>
+    <div class="tab" onclick="openTab(3)">📈 Графики</div>
+    <div class="tab" onclick="openTab(4)">❓ Помощь</div>
+    <div class="tab" onclick="openTab(5)">👤 О программе</div>
 </div>
 
 <!-- Загрузка -->
 <div class="content active">
-    <h2> Загрузка файла</h2>
+    <h2>📂 Загрузка файла</h2>
     <div class="note">
         📌 Формат: CSV или Excel (XLSX)<br>
         Файл должен содержать колонки: ФИО, Класс, Предмет, Оценка
@@ -138,7 +138,7 @@ h2 {
 
 <!-- Редактирование -->
 <div class="content">
-    <h2> Редактирование</h2>
+    <h2>✏️ Редактирование</h2>
     
     <div style="background:#f0f0f0; padding:15px; border-radius:8px;">
         <h3>Добавить запись</h3>
@@ -150,8 +150,8 @@ h2 {
             <option>2</option><option>3</option><option>4</option><option>5</option>
         </select>
         <br>
-        <button onclick="addStudent()"> Добавить</button>
-        <button onclick="saveFile()"> Сохранить в CSV</button>
+        <button onclick="addStudent()">➕ Добавить</button>
+        <button onclick="saveFile()">💾 Сохранить в CSV</button>
     </div>
     
     <h3>Список учеников</h3>
@@ -163,12 +163,12 @@ h2 {
     <select id="deleteSelect">
         <option value="">-- Выберите ученика --</option>
     </select>
-    <button class="delete-btn" onclick="deleteSelected()"> Удалить</button>
+    <button class="delete-btn" onclick="deleteSelected()">🗑️ Удалить</button>
 </div>
 
 <!-- Статистика таблица -->
 <div class="content">
-    <h2> Статистика (табличный вид)</h2>
+    <h2>📊 Статистика (табличный вид)</h2>
     <div class="note">
         <strong>Что такое медиана?</strong> Медиана — это значение, которое находится в середине 
         упорядоченного ряда чисел. Например: оценки 2,3,4,4,5 → медиана = 4.
@@ -184,22 +184,22 @@ h2 {
 
 <!-- Помощь -->
 <div class="content">
-    <h2> Помощь</h2>
+    <h2>❓ Помощь</h2>
     <div class="stat-card">
-        <p><strong> Загрузка</strong> — Выберите файл CSV или Excel с оценками.</p>
-        <p><strong> Редактирование</strong> — Добавляйте новые записи, удаляйте учеников.</p>
-        <p><strong> Статистика</strong> — Для каждого предмета выводится средняя оценка, медиана, количество и процент учеников для каждой оценки (2,3,4,5).</p>
-        <p><strong> Графики</strong> — Визуализация средней оценки по предметам.</p>
-        <p><strong> Сохранение</strong> — Кнопка "Сохранить в CSV" сохранит все данные в файл.</p>
+        <p><strong>📁 Загрузка</strong> — Выберите файл CSV или Excel с оценками.</p>
+        <p><strong>✏️ Редактирование</strong> — Добавляйте новые записи, удаляйте учеников.</p>
+        <p><strong>📊 Статистика</strong> — Для каждого предмета выводится средняя оценка, медиана, количество и процент учеников для каждой оценки (2,3,4,5).</p>
+        <p><strong>📈 Графики</strong> — Визуализация средней оценки по предметам.</p>
+        <p><strong>💾 Сохранение</strong> — Кнопка "Сохранить в CSV" сохранит все данные в файл.</p>
     </div>
 </div>
 
 <!-- О программе -->
 <div class="content">
-    <h2> О программе</h2>
+    <h2>👤 О программе</h2>
     <div class="stat-card">
-        <p><strong>Разработчик:</strong> Иванова Нария Антоновна</p>
-        <p><strong>Email:</strong> ivanovanaria75@gmail.com</p>
+        <p><strong>Разработчик:</strong> Иванов Иван Иванович</p>
+        <p><strong>Email:</strong> ivan.ivanov@student.ru</p>
         <p><strong>Телефон:</strong> +7 (900) 123-45-67</p>
         <p><strong>О программе:</strong> Журнал оценок для учёта успеваемости учеников.</p>
         <img src="https://via.placeholder.com/100" style="border-radius:50%; margin-top:10px;">
@@ -438,7 +438,7 @@ function renderStatistics() {
         let stats = calculateStats(subjectGrades[subject]);
         html += `
             <div class="stat-card">
-                <h3> ${subject}</h3>
+                <h3>📖 ${subject}</h3>
                 <p><strong>Средняя оценка:</strong> ${stats.avg} | <strong>Медиана:</strong> ${stats.median} | <strong>Всего оценок:</strong> ${stats.total}</p>
                 <table style="width:300px">
                     <thead><tr><th>Оценка</th><th>Количество</th><th>Процент</th></tr></thead>
