@@ -129,6 +129,11 @@
         h3, h4 {
             color: #1e466e;
         }
+        .success-msg {
+            color: green;
+            margin-top: 10px;
+            font-weight: bold;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -136,22 +141,21 @@
 <body>
 <div class="app">
     <div class="tabs">
-        <button class="tab-btn active" data-tab="tab1">📂 Загрузка файла</button>
-        <button class="tab-btn" data-tab="tab2">✏️ Редактирование</button>
-        <button class="tab-btn" data-tab="tab3">📊 Статистика (таблица)</button>
-        <button class="tab-btn" data-tab="tab4">📈 Статистика (графики)</button>
-        <button class="tab-btn" data-tab="tab5">❓ Помощь</button>
-        <button class="tab-btn" data-tab="tab6">ℹ️ О программе</button>
+        <button class="tab-btn active" data-tab="tab1">Загрузка файла</button>
+        <button class="tab-btn" data-tab="tab2">Редактирование</button>
+        <button class="tab-btn" data-tab="tab3">Статистика (таблица)</button>
+        <button class="tab-btn" data-tab="tab4">Статистика (графики)</button>
+        <button class="tab-btn" data-tab="tab5">Помощь</button>
+        <button class="tab-btn" data-tab="tab6">О программе</button>
     </div>
 
-    <!-- Вкладка 1: загрузка -->
+    <!-- Вкладка 1: загрузка (без предпросмотра) -->
     <div id="tab1" class="tab-content active">
         <h3>Загрузка оценок из файла</h3>
         <p>Форматы: <strong>.csv, .txt (разделитель ;) , .xlsx</strong></p>
         <p>Столбцы: fio ; class ; informatics ; physics ; mathemathics ; literature ; music</p>
         <input type="file" id="fileInput" accept=".csv,.txt,.xlsx">
-        <h4>Предпросмотр данных:</h4>
-        <div id="previewTable"></div>
+        <div id="uploadMessage"></div>
     </div>
 
     <!-- Вкладка 2: редактирование -->
@@ -171,16 +175,16 @@
             <input type="number" id="litGrade" placeholder="Литература 2-5" min="2" max="5" step="1">
             <input type="number" id="musicGrade" placeholder="Музыка 2-5" min="2" max="5" step="1">
         </div>
-        <button id="addBtn">➕ Добавить</button>
-        <button id="updateBtn" class="warning">✏️ Обновить выбранного</button>
-        <button id="deleteBtn" class="danger">🗑️ Удалить выбранного</button>
-        <p><em>💡 Чтобы выбрать ученика для редактирования/удаления — кликните на строку в таблице выше.</em></p>
+        <button id="addBtn">Добавить</button>
+        <button id="updateBtn" class="warning">Обновить выбранного</button>
+        <button id="deleteBtn" class="danger">Удалить выбранного</button>
+        <p><em>Чтобы выбрать ученика для редактирования/удаления — кликните на строку в таблице выше.</em></p>
     </div>
 
     <!-- Вкладка 3: статистика таблица -->
     <div id="tab3" class="tab-content">
         <h3>Статистика по классам и предметам</h3>
-        <button id="refreshStats">🔄 Обновить статистику</button>
+        <button id="refreshStats">Обновить статистику</button>
         <div id="statsOutput"></div>
     </div>
 
@@ -200,7 +204,7 @@
             <option value="10б">10б</option>
             <option value="10в">10в</option>
         </select>
-        <button id="drawChartBtn">📊 Построить график</button>
+        <button id="drawChartBtn">Построить график</button>
         <div style="margin-top: 20px;">
             <canvas id="gradeChart" width="800" height="400"></canvas>
         </div>
@@ -222,33 +226,29 @@
         <h3>О разработчике</h3>
         <img src="https://cataas.com/cat?width=150&height=150" alt="Фото кошки" class="photo">
         <p><strong>Иванова Нария Антоновна</strong></p>
-        <p>📧 Email: <a href="mailto:ivanovanaria75@gmail.com">ivanovanaria75@gmail.com</a></p>
-        <p>📞 Телефон: +7 (903) 456-78-92</p>
-        <p>📅 Проект: Электронный журнал оценок (HTML/CSS/JS)</p>
-        <p>⭐ Все данные хранятся в браузере (localStorage)</p>
+        <p>Email: <a href="mailto:ivanovanaria75@gmail.com">ivanovanaria75@gmail.com</a></p>
+        <p>Телефон: +7 (903) 456-78-92</p>
+        <p>Проект: Электронный журнал оценок (HTML/CSS/JS)</p>
+        <p>Все данные хранятся в браузере (localStorage)</p>
     </div>
     <footer>Данные сохраняются автоматически. Приложение работает полностью в браузере.</footer>
 </div>
 
 <script>
     // ---------- ДАННЫЕ ----------
-    let students = [];       // массив учеников
+    let students = [];       
     let selectedIndex = null;
 
     const subjects = ["informatics", "physics", "mathemathics", "literature", "music"];
     const subNames = {"informatics":"Информатика","physics":"Физика","mathemathics":"Математика","literature":"Литература","music":"Музыка"};
 
-    // загрузка из localStorage
     function loadData() {
         let saved = localStorage.getItem("journalData");
         if (saved) {
             students = JSON.parse(saved);
         } else {
-            // пустой демо-пример, чтобы таблица не была пустой
-            students = [
-                {fio:"Копылов Игорь", class:"10а", informatics:5, physics:5, mathemathics:5, literature:5, music:5},
-                {fio:"Сидорова Эмилия", class:"10а", informatics:3, physics:4, mathemathics:3, literature:5, music:3}
-            ];
+            students = [];
+            saveData();
         }
     }
 
@@ -256,37 +256,27 @@
         localStorage.setItem("journalData", JSON.stringify(students));
     }
 
-    // отрисовка таблицы предпросмотра (вкладка 1)
-    function renderPreview() {
-        let html = '<table><thead><tr><th>ФИО</th><th>Класс</th><th>Инф</th><th>Физ</th><th>Мат</th><th>Лит</th><th>Муз</th></tr></thead><tbody>';
-        students.forEach(s => {
-            html += `<tr><td>${s.fio}</td><td>${s.class}</td><td>${s.informatics}</td><td>${s.physics}</td><td>${s.mathemathics}</td><td>${s.literature}</td><td>${s.music}</td></tr>`;
-        });
-        html += '</tbody></table>';
-        document.getElementById("previewTable").innerHTML = html || "<p>Нет данных</p>";
-    }
-
     // таблица редактирования с возможностью выбора строки
     function renderEdit() {
-        let html = '<table id="editTableTable"><thead><tr><th>Выбор</th><th>ФИО</th><th>Класс</th><th>Инф</th><th>Физ</th><th>Мат</th><th>Лит</th><th>Муз</th></tr></thead><tbody>';
+        let html = '<table><thead><tr><th>Выбор</th><th>ФИО</th><th>Класс</th><th>Инф</th><th>Физ</th><th>Мат</th><th>Лит</th><th>Муз</th></tr></thead><tbody>';
         students.forEach((s, idx) => {
             let rowClass = (selectedIndex === idx) ? 'class="selected-row"' : '';
             html += `<tr ${rowClass} data-idx="${idx}">
-                        <td><input type="radio" name="selectStudent" value="${idx}"></td>
-                        <td>${s.fio}</td><td>${s.class}</td>
-                        <td>${s.informatics}</td><td>${s.physics}</td>
-                        <td>${s.mathemathics}</td><td>${s.literature}</td><td>${s.music}</td>
-                     </tr>`;
+                        <td><input type="radio" name="selectStudent" value="${idx}"></tr>
+                        <td>${s.fio}</td> <td>${s.class}</td>
+                        <td>${s.informatics}</td> <td>${s.physics}</td>
+                        <td>${s.mathemathics}</td> <td>${s.literature}</td>
+                        <td>${s.music}</td>
+                      </tr>`;
         });
         html += '</tbody></table>';
         document.getElementById("editTable").innerHTML = html;
         
-        // обработчики радиокнопок
         document.querySelectorAll('input[name="selectStudent"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
                 selectedIndex = parseInt(e.target.value);
                 fillForm(selectedIndex);
-                renderEdit();   // перерисовка для подсветки
+                renderEdit();
             });
         });
     }
@@ -332,8 +322,9 @@
         students.push({fio, class: cls, informatics: inf, physics: phys, mathemathics: math, literature: lit, music: mus});
         saveData();
         clearFormAndSelection();
-        renderPreview();
         renderEdit();
+        renderStats();
+        drawChart();
         alert("Добавлено");
     }
 
@@ -341,7 +332,7 @@
         if (selectedIndex === null) { alert("Выберите ученика в таблице"); return; }
         let fio = document.getElementById("studentFio").value.trim();
         let cls = document.getElementById("studentClass").value.trim();
-        if (!fio || !cls) return;
+        if (!fio || !cls) { alert("Заполните ФИО и класс"); return; }
         students[selectedIndex] = {
             fio, class: cls,
             informatics: parseInt(document.getElementById("infoGrade").value),
@@ -352,8 +343,9 @@
         };
         saveData();
         clearFormAndSelection();
-        renderPreview();
         renderEdit();
+        renderStats();
+        drawChart();
         alert("Обновлено");
     }
 
@@ -363,8 +355,9 @@
         selectedIndex = null;
         saveData();
         clearFormAndSelection();
-        renderPreview();
         renderEdit();
+        renderStats();
+        drawChart();
         alert("Удалено");
     }
 
@@ -387,7 +380,6 @@
                 byClass[cls][sub] = {mean, median, count, percent, total: grades.length};
             }
         }
-        // общая
         let overall = {};
         for (let sub of subjects) {
             let grades = students.map(s => s[sub]);
@@ -405,27 +397,27 @@
 
     function renderStats() {
         let stats = computeAllStats();
-        let html = `<h4>📌 Статистика по классам</h4>`;
+        let html = `<h4>Статистика по классам</h4>`;
         for (let cls of stats.classes) {
             html += `<h5>Класс ${cls}</h5><div class="stats-table"><table><thead><tr><th>Предмет</th><th>Среднее</th><th>Медиана</th><th>Оценка 2</th><th>Оценка 3</th><th>Оценка 4</th><th>Оценка 5</th></tr></thead><tbody>`;
             for (let sub of subjects) {
                 let d = stats.byClass[cls][sub];
                 html += `<tr><td>${subNames[sub]}</td><td>${d.mean}</td><td>${d.median}</td>
-                         <td>${d.count[2]} (${d.percent[2]}%)</td>
-                         <td>${d.count[3]} (${d.percent[3]}%)</td>
-                         <td>${d.count[4]} (${d.percent[4]}%)</td>
-                         <td>${d.count[5]} (${d.percent[5]}%)</td></tr>`;
+                          <td>${d.count[2]} (${d.percent[2]}%)</td>
+                          <td>${d.count[3]} (${d.percent[3]}%)</td>
+                          <td>${d.count[4]} (${d.percent[4]}%)</td>
+                          <td>${d.count[5]} (${d.percent[5]}%)</td></tr>`;
             }
             html += `</tbody></table></div>`;
         }
-        html += `<h4>🏫 Общая статистика (все классы)</h4><table><thead><tr><th>Предмет</th><th>Среднее</th><th>Медиана</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody>`;
+        html += `<h4>Общая статистика (все классы)</h4><table><thead><tr><th>Предмет</th><th>Среднее</th><th>Медиана</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody>`;
         for (let sub of subjects) {
             let d = stats.overall[sub];
             html += `<tr><td>${subNames[sub]}</td><td>${d.mean}</td><td>${d.median}</td>
-                     <td>${d.count[2]} (${d.percent[2]}%)</td>
-                     <td>${d.count[3]} (${d.percent[3]}%)</td>
-                     <td>${d.count[4]} (${d.percent[4]}%)</td>
-                     <td>${d.count[5]} (${d.percent[5]}%)</td></tr>`;
+                      <td>${d.count[2]} (${d.percent[2]}%)</td>
+                      <td>${d.count[3]} (${d.percent[3]}%)</td>
+                      <td>${d.count[4]} (${d.percent[4]}%)</td>
+                      <td>${d.count[5]} (${d.percent[5]}%)</td></tr>`;
         }
         html += `</tbody></table>`;
         document.getElementById("statsOutput").innerHTML = html;
@@ -459,7 +451,7 @@
         });
     }
 
-    // ЗАГРУЗКА ФАЙЛА
+    // ЗАГРУЗКА ФАЙЛА (без предпросмотра)
     function loadFile(file) {
         let ext = file.name.split('.').pop().toLowerCase();
         if (ext === 'xlsx') {
@@ -486,7 +478,7 @@
 
     function parseData(lines) {
         let newStudents = [];
-        for (let i = 1; i < lines.length; i++) { // пропускаем заголовок
+        for (let i = 1; i < lines.length; i++) {
             let parts = lines[i].split(';');
             if (parts.length < 7) continue;
             let fio = parts[0]?.trim();
@@ -503,11 +495,11 @@
         if (newStudents.length) {
             students = newStudents;
             saveData();
-            renderPreview();
             renderEdit();
             renderStats();
             drawChart();
-            alert(`Загружено ${students.length} учеников`);
+            document.getElementById("uploadMessage").innerHTML = '<div class="success-msg">Загружено ' + students.length + ' учеников</div>';
+            setTimeout(() => { document.getElementById("uploadMessage").innerHTML = ''; }, 3000);
         } else {
             alert("Не удалось найти данные. Проверьте формат (разделитель ; и столбцы: fio;class;informatics;physics;mathemathics;literature;music)");
         }
@@ -516,12 +508,10 @@
     // ---------- ИНИЦИАЛИЗАЦИЯ ----------
     function init() {
         loadData();
-        renderPreview();
         renderEdit();
         renderStats();
         drawChart();
 
-        // вкладки
         document.querySelectorAll(".tab-btn").forEach(btn => {
             btn.addEventListener("click", () => {
                 document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -545,4 +535,4 @@
     init();
 </script>
 </body>
-</html>
+</html>Ы
