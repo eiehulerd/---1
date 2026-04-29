@@ -5,34 +5,33 @@
     <title>Журнал оценок</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #1e3a5f; padding: 20px; }
-        .container { max-width: 1300px; margin: auto; background: white; border-radius: 10px; overflow: hidden; }
-        .tabs { display: flex; background: #0f2b3d; flex-wrap: wrap; }
-        .tab { padding: 12px 20px; color: white; cursor: pointer; font-weight: bold; }
-        .tab:hover { background: #2c5282; }
-        .tab.active { background: #2c5282; border-bottom: 3px solid #fbbf24; }
-        .content { display: none; padding: 20px; min-height: 500px; }
+        body { font-family: Arial; margin: 0; padding: 20px; background: #f0f2f5; }
+        .app { max-width: 1300px; margin: auto; background: white; border-radius: 10px; overflow: hidden; }
+        .tabs { display: flex; background: #2c3e50; flex-wrap: wrap; }
+        .tab { padding: 12px 25px; color: white; cursor: pointer; font-weight: bold; }
+        .tab:hover { background: #1a365d; }
+        .tab.active { background: #1a365d; border-bottom: 3px solid #fbbf24; }
+        .content { display: none; padding: 20px; }
         .content.active { display: block; }
-        h2 { color: #1e3a5f; margin-bottom: 20px; border-left: 4px solid #fbbf24; padding-left: 15px; }
-        h3 { margin: 15px 0 10px 0; color: #2c5282; }
+        h2 { color: #2c3e50; border-left: 4px solid #fbbf24; padding-left: 15px; margin-bottom: 20px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background: #1e3a5f; color: white; }
+        th { background: #2c3e50; color: white; }
         input, select { padding: 8px; margin: 5px; border: 1px solid #ccc; border-radius: 5px; }
-        button { padding: 8px 15px; margin: 5px; background: #2c5282; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #1e3a5f; }
-        .del-btn { background: #c53030; }
-        .del-btn:hover { background: #9b2c2c; }
-        .card { background: #f0f4f8; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .stat-card { background: #f8fafc; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #2c5282; }
-        .profile { display: flex; gap: 20px; align-items: center; }
-        .avatar { width: 80px; height: 80px; background: #2c5282; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; }
-        footer { text-align: center; padding: 15px; background: #0f2b3d; color: white; }
+        button { padding: 8px 15px; margin: 5px; background: #2c3e50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #1a365d; }
+        .del { background: #c0392b; }
+        .del:hover { background: #a93226; }
+        .card { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .stat-card { background: #f8f9fa; padding: 15px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #2c3e50; }
+        .photo { width: 80px; height: 80px; background: #2c3e50; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 30px; }
+        .flex { display: flex; gap: 20px; align-items: center; }
+        footer { text-align: center; padding: 15px; background: #2c3e50; color: white; }
+        @media (max-width: 700px) { .tab { padding: 10px 15px; font-size: 12px; } }
     </style>
 </head>
 <body>
-<div class="container">
+<div class="app">
     <div class="tabs">
         <div class="tab active" onclick="openTab(0)">Загрузка</div>
         <div class="tab" onclick="openTab(1)">Редактирование</div>
@@ -42,228 +41,186 @@
         <div class="tab" onclick="openTab(5)">О программе</div>
     </div>
 
-    <!-- Вкладка 0: Загрузка -->
     <div id="tab0" class="content active">
-        <h2>Загрузка файла</h2>
-        <div class="card">
-            <input type="file" id="fileInput" accept=".csv,.txt,.xlsx">
-            <button onclick="loadExample()">Пример</button>
-            <p style="margin-top:10px; font-size:12px">Формат: ФИО;Класс;Информатика;Физика;Математика;Литература;Музыка</p>
-        </div>
-        <h3>Предпросмотр</h3>
-        <div style="overflow-x:auto"><table id="previewTable"></table></div>
+        <h2>Загрузка оценок</h2>
+        <input type="file" id="fileInput" accept=".csv,.txt,.xlsx">
+        <button onclick="loadExample()">Пример</button>
+        <div style="overflow-x:auto"><table id="previewTable"><tr><th>Нет данных</th></tr></table></div>
     </div>
 
-    <!-- Вкладка 1: Редактирование -->
     <div id="tab1" class="content">
-        <h2>Редактирование</h2>
+        <h2>Редактирование журнала</h2>
         <div class="card">
-            <h3>Добавить</h3>
-            <input type="text" id="fio" placeholder="ФИО">
-            <input type="text" id="class" placeholder="Класс" style="width:80px">
-            <select id="subject">
-                <option>Информатика</option><option>Физика</option><option>Математика</option><option>Литература</option><option>Музыка</option>
-            </select>
-            <select id="grade"><option>2</option><option>3</option><option>4</option><option>5</option></select>
-            <button onclick="addRecord()">Добавить</button>
-            <button onclick="saveToCSV()">Сохранить в CSV</button>
+            <input type="text" id="fio" placeholder="ФИО" style="width:200px">
+            <input type="text" id="cls" placeholder="Класс" style="width:80px">
+            <select id="subj"><option>Информатика</option><option>Физика</option><option>Математика</option><option>Литература</option><option>Музыка</option></select>
+            <select id="gr"><option>2</option><option>3</option><option>4</option><option>5</option></select>
+            <button onclick="addGrade()">Добавить</button>
+            <button onclick="saveFile()">Сохранить</button>
         </div>
         <div class="card">
-            <h3>Удалить ученика</h3>
-            <select id="deleteSelect"></select>
-            <button class="del-btn" onclick="deleteStudent()">Удалить</button>
+            <select id="delSelect" style="width:250px"></select>
+            <button class="del" onclick="deleteStudent()">Удалить ученика</button>
         </div>
         <div class="card">
-            <h3>Редактировать</h3>
-            <select id="editSelect" onchange="loadForEdit()"></select>
+            <select id="editSelect" style="width:250px" onchange="loadEdit()"></select>
             <button onclick="editStudent()">Редактировать</button>
         </div>
-        <h3>Список</h3>
-        <div style="overflow-x:auto"><table id="editTable"></table></div>
+        <div style="overflow-x:auto"><table id="editTable"><tr><th>Нет данных</th></tr></table></div>
     </div>
 
-    <!-- Вкладка 2: Статистика -->
     <div id="tab2" class="content">
         <h2>Статистика</h2>
-        <div id="statsContainer"></div>
+        <div id="statBlock"></div>
     </div>
 
-    <!-- Вкладка 3: Графики -->
     <div id="tab3" class="content">
         <h2>Графики</h2>
-        <div id="chartsContainer"></div>
+        <div id="chartBlock"></div>
     </div>
 
-    <!-- Вкладка 4: Помощь -->
     <div id="tab4" class="content">
         <h2>Помощь</h2>
         <div class="card">
-            <p><strong>Загрузка:</strong> Выберите CSV или TXT файл (разделитель ;)</p>
-            <p><strong>Редактирование:</strong> Добавляйте, удаляйте, редактируйте записи</p>
-            <p><strong>Статистика:</strong> Средняя, медиана, % оценок по предметам</p>
-            <p><strong>Графики:</strong> Визуализация оценок</p>
+            <p><b>Загрузка:</b> CSV/TXT/XLSX с разделителем ;. Формат: ФИО;Класс;Информатика;Физика;Математика;Литература;Музыка</p>
+            <p><b>Редактирование:</b> Добавление, удаление ученика, редактирование ФИО и класса</p>
+            <p><b>Статистика:</b> Средняя, медиана, кол-во и % оценок (2,3,4,5) по каждому предмету</p>
+            <p><b>Графики:</b> Визуализация распределения оценок</p>
         </div>
     </div>
 
-    <!-- Вкладка 5: О программе -->
     <div id="tab5" class="content">
         <h2>О программе</h2>
         <div class="card">
-            <div class="profile">
-                <div class="avatar">👨‍💻</div>
-                <div>
-                    <p><strong>Иванов Иван Алексеевич</strong></p>
-                    <p>Email: ivanov@student.ru</p>
-                    <p>Телефон: +7 (999) 123-45-67</p>
-                </div>
+            <div class="flex">
+                <div class="photo">ИИ</div>
+                <div><b>Иванов Иван Алексеевич</b><br>Email: ivanov@edu.ru<br>Тел: +7 (999) 123-45-67</div>
             </div>
         </div>
     </div>
-    <footer>Журнал оценок © 2024</footer>
+    <footer>Журнал оценок</footer>
 </div>
 
 <script>
-// ДАННЫЕ: каждый ученик - одна строка с 7 полями
 let students = [];
-let charts = [];
+let myCharts = [];
 
-// ===== ОТКРЫТИЕ ВКЛАДОК =====
+function getMedian(arr) { let s = [...arr].sort((a,b)=>a-b); return s[Math.floor(s.length/2)]; }
+
 function openTab(n) {
-    let tabs = document.querySelectorAll('.content');
-    let btns = document.querySelectorAll('.tab');
-    for(let i=0; i<tabs.length; i++) {
-        tabs[i].classList.remove('active');
-        btns[i].classList.remove('active');
-    }
-    tabs[n].classList.add('active');
-    btns[n].classList.add('active');
-    if(n==2) showStats();
-    if(n==3) showCharts();
+    let c = document.querySelectorAll('.content');
+    let t = document.querySelectorAll('.tab');
+    for(let i=0;i<c.length;i++) { c[i].classList.remove('active'); t[i].classList.remove('active'); }
+    c[n].classList.add('active');
+    t[n].classList.add('active');
+    if(n==2) renderStat();
+    if(n==3) renderCharts();
 }
 
-// ===== МЕДИАНА =====
-function median(arr) {
-    if(arr.length==0) return 0;
-    let s = [...arr].sort((a,b)=>a-b);
-    return s[Math.floor(s.length/2)];
-}
-
-// ===== ЗАГРУЗКА ПРИМЕРА (ВАШ ФАЙЛ) =====
 function loadExample() {
     students = [
-        {fio:"Копылов Игорь Максимович",class:"10а",informatics:5,physics:5,mathematics:5,literature:5,music:5},
-        {fio:"Сидорова Эмилия Максимовна",class:"10а",informatics:3,physics:4,mathematics:3,literature:5,music:3},
-        {fio:"Осипова Диана Артёмовна",class:"10а",informatics:4,physics:3,mathematics:3,literature:5,music:3},
-        {fio:"Комиссарова Виктория Савельевна",class:"10а",informatics:3,physics:4,mathematics:3,literature:4,music:3},
-        {fio:"Зуев Мирон Романович",class:"10а",informatics:4,physics:4,mathematics:4,literature:4,music:4},
-        {fio:"Сотникова Миша Богдановна",class:"10б",informatics:3,physics:3,mathematics:3,literature:3,music:3},
-        {fio:"Русаков Дмитрий Владимирович",class:"10б",informatics:2,physics:4,mathematics:4,literature:3,music:3},
-        {fio:"Иванова София Максимовна",class:"10б",informatics:4,physics:4,mathematics:4,literature:4,music:4},
-        {fio:"Антонова Полина Данииловна",class:"10б",informatics:3,physics:3,mathematics:3,literature:3,music:3},
-        {fio:"Фомин Леонид Родионович",class:"10б",informatics:4,physics:5,mathematics:5,literature:4,music:4},
-        {fio:"Лапина Анна Тимофеевна",class:"10б",informatics:5,physics:5,mathematics:5,literature:5,music:5},
-        {fio:"Соколов Александр Артёмович",class:"10в",informatics:5,physics:5,mathematics:5,literature:5,music:5},
-        {fio:"Соколов Артемий Богданович",class:"10в",informatics:3,physics:3,mathematics:3,literature:3,music:3},
-        {fio:"Романов Данил Михайлович",class:"10в",informatics:5,physics:5,mathematics:5,literature:5,music:5},
-        {fio:"Вишневская Мария Сергеевна",class:"10в",informatics:5,physics:5,mathematics:5,literature:5,music:5},
-        {fio:"Давыдов Степан Викторович",class:"10в",informatics:2,physics:4,mathematics:4,literature:3,music:3}
+        {fio:"Копылов Игорь Максимович",class:"10а",inf:5,phy:5,math:5,lit:5,mus:5},
+        {fio:"Сидорова Эмилия Максимовна",class:"10а",inf:3,phy:4,math:3,lit:5,mus:3},
+        {fio:"Осипова Диана Артёмовна",class:"10а",inf:4,phy:3,math:3,lit:5,mus:3},
+        {fio:"Комиссарова Виктория Савельевна",class:"10а",inf:3,phy:4,math:3,lit:4,mus:3},
+        {fio:"Зуев Мирон Романович",class:"10а",inf:4,phy:4,math:4,lit:4,mus:4},
+        {fio:"Сотникова Миша Богдановна",class:"10б",inf:3,phy:3,math:3,lit:3,mus:3},
+        {fio:"Русаков Дмитрий Владимирович",class:"10б",inf:2,phy:4,math:4,lit:3,mus:3},
+        {fio:"Иванова София Максимовна",class:"10б",inf:4,phy:4,math:4,lit:4,mus:4},
+        {fio:"Антонова Полина Данииловна",class:"10б",inf:3,phy:3,math:3,lit:3,mus:3},
+        {fio:"Фомин Леонид Родионович",class:"10б",inf:4,phy:5,math:5,lit:4,mus:4},
+        {fio:"Лапина Анна Тимофеевна",class:"10б",inf:5,phy:5,math:5,lit:5,mus:5},
+        {fio:"Соколов Александр Артёмович",class:"10в",inf:5,phy:5,math:5,lit:5,mus:5},
+        {fio:"Соколов Артемий Богданович",class:"10в",inf:3,phy:3,math:3,lit:3,mus:3},
+        {fio:"Романов Данил Михайлович",class:"10в",inf:5,phy:5,math:5,lit:5,mus:5},
+        {fio:"Вишневская Мария Сергеевна",class:"10в",inf:5,phy:5,math:5,lit:5,mus:5},
+        {fio:"Давыдов Степан Викторович",class:"10в",inf:2,phy:4,math:4,lit:3,mus:3}
     ];
-    refreshAll();
+    refresh();
 }
 
-// ===== ЗАГРУЗКА ИЗ ФАЙЛА =====
 document.getElementById('fileInput').addEventListener('change', function(e) {
     let file = e.target.files[0];
     if(!file) return;
-    let reader = new FileReader();
-    reader.onload = function(ev) {
-        let text = ev.target.result;
-        let lines = text.split(/\r?\n/);
-        let newStudents = [];
+    let r = new FileReader();
+    r.onload = function(ev) {
+        let lines = ev.target.result.split(/\r?\n/);
+        let arr = [];
         for(let i=1; i<lines.length; i++) {
-            let cols = lines[i].split(';');
-            if(cols.length >= 7 && cols[0]) {
-                newStudents.push({
-                    fio: cols[0].trim(),
-                    class: cols[1].trim(),
-                    informatics: parseInt(cols[2]) || 3,
-                    physics: parseInt(cols[3]) || 3,
-                    mathematics: parseInt(cols[4]) || 3,
-                    literature: parseInt(cols[5]) || 3,
-                    music: parseInt(cols[6]) || 3
+            let c = lines[i].split(';');
+            if(c.length>=7 && c[0]) {
+                let fio = c[0].trim().replace(/[ЉЋЌЂЃЏЅ€]/g, function(m) {
+                    let map = {'Љ':'К','Ћ':'Ћ','Ќ':'К','Ђ':'Б','Ѓ':'Г','Џ':'П','Ѕ':'З','€':'Е'};
+                    return map[m] || '?';
+                });
+                arr.push({
+                    fio: fio,
+                    class: c[1].trim(),
+                    inf: parseInt(c[2])||3,
+                    phy: parseInt(c[3])||3,
+                    math: parseInt(c[4])||3,
+                    lit: parseInt(c[5])||3,
+                    mus: parseInt(c[6])||3
                 });
             }
         }
-        if(newStudents.length > 0) {
-            students = newStudents;
-            refreshAll();
-        } else alert("Ошибка чтения файла");
+        if(arr.length) { students = arr; refresh(); }
+        else alert("Ошибка чтения файла. Используйте кнопку Пример");
     };
-    reader.readAsText(file, 'utf-8');
+    r.readAsText(file,'utf-8');
 });
 
-// ===== ДОБАВИТЬ =====
-function addRecord() {
+function addGrade() {
     let fio = document.getElementById('fio').value.trim();
-    let cls = document.getElementById('class').value.trim();
-    let subj = document.getElementById('subject').value;
-    let grade = parseInt(document.getElementById('grade').value);
+    let cls = document.getElementById('cls').value.trim();
+    let subj = document.getElementById('subj').value;
+    let gr = parseInt(document.getElementById('gr').value);
     if(!fio || !cls) { alert("Введите ФИО и класс"); return; }
-    // Добавляем оценку по выбранному предмету
-    let newStudent = {fio:fio, class:cls, informatics:3, physics:3, mathematics:3, literature:3, music:3};
-    if(subj=="Информатика") newStudent.informatics = grade;
-    else if(subj=="Физика") newStudent.physics = grade;
-    else if(subj=="Математика") newStudent.mathematics = grade;
-    else if(subj=="Литература") newStudent.literature = grade;
-    else if(subj=="Музыка") newStudent.music = grade;
-    students.push(newStudent);
-    refreshAll();
+    let s = {fio:fio, class:cls, inf:3, phy:3, math:3, lit:3, mus:3};
+    if(subj=="Информатика") s.inf = gr;
+    else if(subj=="Физика") s.phy = gr;
+    else if(subj=="Математика") s.math = gr;
+    else if(subj=="Литература") s.lit = gr;
+    else s.mus = gr;
+    students.push(s);
+    refresh();
     document.getElementById('fio').value = '';
-    document.getElementById('class').value = '';
+    document.getElementById('cls').value = '';
 }
 
-// ===== УДАЛИТЬ УЧЕНИКА =====
 function deleteStudent() {
-    let sel = document.getElementById('deleteSelect');
+    let sel = document.getElementById('delSelect');
     let idx = sel.value;
     if(idx=="") { alert("Выберите ученика"); return; }
-    if(confirm("Удалить?")) {
-        students.splice(idx,1);
-        refreshAll();
-    }
+    if(confirm("Удалить?")) { students.splice(idx,1); refresh(); }
 }
 
-// ===== ЗАГРУЗИТЬ ДЛЯ РЕДАКТИРОВАНИЯ =====
-function loadForEdit() {
+function loadEdit() {
     let sel = document.getElementById('editSelect');
     let idx = sel.value;
     if(idx=="") return;
     let s = students[idx];
     document.getElementById('fio').value = s.fio;
-    document.getElementById('class').value = s.class;
+    document.getElementById('cls').value = s.class;
 }
 
-// ===== РЕДАКТИРОВАТЬ =====
 function editStudent() {
     let sel = document.getElementById('editSelect');
     let idx = sel.value;
     if(idx=="") { alert("Выберите ученика"); return; }
-    let newFio = document.getElementById('fio').value.trim();
-    let newClass = document.getElementById('class').value.trim();
-    if(!newFio || !newClass) { alert("Введите ФИО и класс"); return; }
-    students[idx].fio = newFio;
-    students[idx].class = newClass;
-    refreshAll();
+    let fio = document.getElementById('fio').value.trim();
+    let cls = document.getElementById('cls').value.trim();
+    if(!fio || !cls) { alert("Введите ФИО и класс"); return; }
+    students[idx].fio = fio;
+    students[idx].class = cls;
+    refresh();
 }
 
-// ===== СОХРАНИТЬ =====
-function saveToCSV() {
-    if(students.length==0) { alert("Нет данных"); return; }
-    let content = "ФИО;Класс;Информатика;Физика;Математика;Литература;Музыка\n";
-    for(let s of students) {
-        content += `${s.fio};${s.class};${s.informatics};${s.physics};${s.mathematics};${s.literature};${s.music}\n`;
-    }
-    let blob = new Blob([content], {type:"text/csv"});
+function saveFile() {
+    if(!students.length) { alert("Нет данных"); return; }
+    let txt = "ФИО;Класс;Информатика;Физика;Математика;Литература;Музыка\n";
+    for(let s of students) txt += `${s.fio};${s.class};${s.inf};${s.phy};${s.math};${s.lit};${s.mus}\n`;
+    let blob = new Blob([txt], {type:"text/csv"});
     let a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = "journal.csv";
@@ -271,127 +228,80 @@ function saveToCSV() {
     URL.revokeObjectURL(a.href);
 }
 
-// ===== ПОКАЗАТЬ ТАБЛИЦЫ =====
-function showPreview() {
-    let html = '<tr><th>ФИО</th><th>Класс</th><th>Инф</th><th>Физ</th><th>Мат</th><th>Лит</th><th>Муз</th></tr>';
-    for(let s of students) {
-        html += `<tr><td>${s.fio}</td><td>${s.class}</td><td>${s.informatics}</td><td>${s.physics}</td><td>${s.mathematics}</td><td>${s.literature}</td><td>${s.music}</td></tr>`;
-    }
-    document.getElementById('previewTable').innerHTML = html || '<tr><td>Нет данных</td></tr>';
-}
-
-function showEdit() {
-    let html = '<tr><th>ФИО</th><th>Класс</th><th>Инф</th><th>Физ</th><th>Мат</th><th>Лит</th><th>Муз</th></tr>';
-    for(let i=0; i<students.length; i++) {
-        let s = students[i];
-        html += `<tr><td>${s.fio}</td><td>${s.class}</td><td>${s.informatics}</td><td>${s.physics}</td><td>${s.mathematics}</td><td>${s.literature}</td><td>${s.music}</td></tr>`;
-    }
-    document.getElementById('editTable').innerHTML = html || '<tr><td>Нет данных</td></tr>';
+function renderTables() {
+    let html1 = '<tr><th>ФИО</th><th>Класс</th><th>Инф</th><th>Физ</th><th>Мат</th><th>Лит</th><th>Муз</th></tr>';
+    for(let s of students) html1 += `<tr><td>${s.fio}</td><td>${s.class}</td><td>${s.inf}</td><td>${s.phy}</td><td>${s.math}</td><td>${s.lit}</td><td>${s.mus}</td></tr>`;
+    document.getElementById('previewTable').innerHTML = html1 || '<tr><td>Нет данных</td></tr>';
     
-    // Заполняем выпадающие списки
-    let opts = '<option value="">-- Выберите --</option>';
-    for(let i=0; i<students.length; i++) {
-        opts += `<option value="${i}">${students[i].fio} (${students[i].class})</option>`;
-    }
-    document.getElementById('deleteSelect').innerHTML = opts;
+    let html2 = '<tr><th>ФИО</th><th>Класс</th><th>Инф</th><th>Физ</th><th>Мат</th><th>Лит</th><th>Муз</th></tr>';
+    for(let s of students) html2 += `<tr><td>${s.fio}</td><td>${s.class}</td><td>${s.inf}</td><td>${s.phy}</td><td>${s.math}</td><td>${s.lit}</td><td>${s.mus}</td></tr>`;
+    document.getElementById('editTable').innerHTML = html2 || '<tr><td>Нет данных</td></tr>';
+    
+    let opts = '<option value="">-- Выберите ученика --</option>';
+    for(let i=0;i<students.length;i++) opts += `<option value="${i}">${students[i].fio} (${students[i].class})</option>`;
+    document.getElementById('delSelect').innerHTML = opts;
     document.getElementById('editSelect').innerHTML = opts;
 }
 
-// ===== СТАТИСТИКА =====
-function showStats() {
-    // Собираем оценки по предметам
-    let subjects = ['informatics','physics','mathematics','literature','music'];
-    let subjNames = {'informatics':'Информатика','physics':'Физика','mathematics':'Математика','literature':'Литература','music':'Музыка'};
-    
-    let totalData = {};
-    for(let subj of subjects) totalData[subj] = [];
-    for(let s of students) {
-        for(let subj of subjects) {
-            totalData[subj].push(s[subj]);
-        }
-    }
-    
-    function calcStats(arr, name) {
-        if(arr.length==0) return '';
+function renderStat() {
+    let subs = ['inf','phy','math','lit','mus'];
+    let names = ['Информатика','Физика','Математика','Литература','Музыка'];
+    let html = '';
+    for(let idx=0; idx<subs.length; idx++) {
+        let grades = [];
+        for(let s of students) grades.push(s[subs[idx]]);
+        if(grades.length==0) continue;
         let sum = 0;
-        for(let v of arr) sum += v;
-        let avg = (sum/arr.length).toFixed(2);
-        let med = median(arr);
-        let counts = {2:0,3:0,4:0,5:0};
-        for(let v of arr) if(v>=2 && v<=5) counts[v]++;
-        let html = `<div class="stat-card">
-            <h3>${name}</h3>
-            <p>Средняя: ${avg} | Медиана: ${med} | Всего: ${arr.length}</p>
+        for(let g of grades) sum += g;
+        let avg = (sum/grades.length).toFixed(2);
+        let med = getMedian(grades);
+        let cnt = {2:0,3:0,4:0,5:0};
+        for(let g of grades) if(g>=2 && g<=5) cnt[g]++;
+        html += `<div class="stat-card">
+            <h3>${names[idx]}</h3>
+            <p>Средняя: ${avg} | Медиана: ${med} | Всего: ${grades.length}</p>
             <table style="width:250px">
                 <tr><th>Оценка</th><th>Кол-во</th><th>%</th></tr>
-                <tr><td>2</td><td>${counts[2]}</td><td>${ (counts[2]/arr.length*100).toFixed(1)}%</td></tr>
-                <tr><td>3</td><td>${counts[3]}</td><td>${ (counts[3]/arr.length*100).toFixed(1)}%</td></tr>
-                <tr><td>4</td><td>${counts[4]}</td><td>${ (counts[4]/arr.length*100).toFixed(1)}%</td></tr>
-                <tr><td>5</td><td>${counts[5]}</td><td>${ (counts[5]/arr.length*100).toFixed(1)}%</td></tr>
+                <tr><td>2</td><td>${cnt[2]}</td><td>${(cnt[2]/grades.length*100).toFixed(1)}%</td></tr>
+                <tr><td>3</td><td>${cnt[3]}</td><td>${(cnt[3]/grades.length*100).toFixed(1)}%</td></tr>
+                <tr><td>4</td><td>${cnt[4]}</td><td>${(cnt[4]/grades.length*100).toFixed(1)}%</td></tr>
+                <tr><td>5</td><td>${cnt[5]}</td><td>${(cnt[5]/grades.length*100).toFixed(1)}%</td></tr>
             </table>
         </div>`;
-        return html;
     }
-    
-    let html = '<h3>Общая статистика (все классы)</h3>';
-    for(let subj of subjects) {
-        html += calcStats(totalData[subj], subjNames[subj]);
-    }
-    document.getElementById('statsContainer').innerHTML = html;
+    document.getElementById('statBlock').innerHTML = html || '<div class="card">Нет данных</div>';
 }
 
-// ===== ГРАФИКИ =====
-function showCharts() {
-    let container = document.getElementById('chartsContainer');
+function renderCharts() {
+    let container = document.getElementById('chartBlock');
     container.innerHTML = '';
-    for(let ch of charts) if(ch) ch.destroy();
-    charts = [];
-    
-    let subjects = ['informatics','physics','mathematics','literature','music'];
-    let subjNames = {'informatics':'Информатика','physics':'Физика','mathematics':'Математика','literature':'Литература','music':'Музыка'};
-    
-    let totalData = {};
-    for(let subj of subjects) totalData[subj] = [];
-    for(let s of students) {
-        for(let subj of subjects) totalData[subj].push(s[subj]);
-    }
-    
-    for(let subj of subjects) {
-        let arr = totalData[subj];
-        if(arr.length==0) continue;
-        let counts = {2:0,3:0,4:0,5:0};
-        for(let v of arr) if(v>=2 && v<=5) counts[v]++;
-        
-        let canvasId = 'ch_' + subj;
+    for(let ch of myCharts) if(ch) ch.destroy();
+    myCharts = [];
+    let subs = ['inf','phy','math','lit','mus'];
+    let names = ['Информатика','Физика','Математика','Литература','Музыка'];
+    for(let idx=0; idx<subs.length; idx++) {
+        let grades = [];
+        for(let s of students) grades.push(s[subs[idx]]);
+        if(grades.length==0) continue;
+        let cnt = {2:0,3:0,4:0,5:0};
+        for(let g of grades) if(g>=2 && g<=5) cnt[g]++;
+        let canvasId = 'c' + idx;
         let div = document.createElement('div');
         div.className = 'card';
-        div.innerHTML = `<h3>${subjNames[subj]}</h3><canvas id="${canvasId}" width="400" height="200" style="max-width:100%"></canvas>`;
+        div.innerHTML = `<h3>${names[idx]}</h3><canvas id="${canvasId}" width="400" height="200" style="max-width:100%"></canvas>`;
         container.appendChild(div);
-        
         let ctx = document.getElementById(canvasId).getContext('2d');
-        let chart = new Chart(ctx, {
+        let ch = new Chart(ctx, {
             type: 'bar',
-            data: {
-                labels: ['2','3','4','5'],
-                datasets: [{ label: 'Количество', data: [counts[2], counts[3], counts[4], counts[5]], backgroundColor: ['#ef4444','#f59e0b','#3b82f6','#10b981'] }]
-            },
-            options: { responsive: true, maintainAspectRatio: true }
+            data: { labels: ['2','3','4','5'], datasets: [{ label: 'Количество', data: [cnt[2],cnt[3],cnt[4],cnt[5]], backgroundColor: ['#ef4444','#f59e0b','#3b82f6','#10b981'] }] },
+            options: { responsive: true }
         });
-        charts.push(chart);
+        myCharts.push(ch);
     }
-    
     if(students.length==0) container.innerHTML = '<div class="card">Нет данных</div>';
 }
 
-// ===== ОБНОВИТЬ ВСЁ =====
-function refreshAll() {
-    showPreview();
-    showEdit();
-    showStats();
-    showCharts();
-}
-
-// ЗАПУСК
+function refresh() { renderTables(); renderStat(); renderCharts(); }
 loadExample();
 </script>
 </body>
