@@ -15,7 +15,7 @@
             padding: 20px;
         }
         .app {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -140,6 +140,10 @@
             padding: 20px;
             font-style: italic;
         }
+        .preview-table {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -158,9 +162,14 @@
     <div id="tab1" class="tab-content active">
         <h3>Загрузка оценок из файла</h3>
         <p>Форматы: <strong>.csv, .txt (разделитель ;) , .xlsx</strong></p>
-        <p>Столбцы: fio ; class ; informatics ; physics ; mathematics ; literature</p>
+        <p>Столбцы: fio ; class ; informatics ; physics ; mathemathics (или mathematics) ; literature</p>
         <input type="file" id="fileInput" accept=".csv,.txt,.xlsx">
         <div id="uploadMessage"></div>
+        
+        <div class="preview-table">
+            <h4>Предпросмотр загруженных данных:</h4>
+            <div id="previewTable"></div>
+        </div>
     </div>
 
     <div id="tab2" class="tab-content">
@@ -210,7 +219,7 @@
     <div id="tab5" class="tab-content">
         <h3>Помощь</h3>
         <ul>
-            <li><b>Загрузка файла</b> – выберите файл .csv или .xlsx с разделителем ; (столбцы: fio, class, informatics, physics, mathematics, literature). Данные сохранятся автоматически.</li>
+            <li><b>Загрузка файла</b> – выберите файл .csv или .xlsx с разделителем ; (столбцы: fio, class, informatics, physics, mathemathics или mathematics, literature). После загрузки появится таблица с данными.</li>
             <li><b>Редактирование</b> – таблица со всеми учениками. Чтобы изменить или удалить – кликните на строку, затем нажмите "Обновить" или "Удалить". Добавление нового ученика – заполните поля и нажмите "Добавить".</li>
             <li><b>Статистика (таблица)</b> – средняя оценка, медиана, количество и процент учеников для каждой оценки (2,3,4,5) по каждому классу и предмету + общая по школе.</li>
             <li><b>Статистика (графики)</b> – гистограмма для выбранного предмета и класса.</li>
@@ -248,6 +257,27 @@
 
     function saveData() {
         localStorage.setItem("journalData", JSON.stringify(students));
+    }
+
+    // Предпросмотр таблицы на вкладке загрузки
+    function renderPreview() {
+        if (students.length === 0) {
+            document.getElementById("previewTable").innerHTML = '<div class="empty-msg">Нет данных. Загрузите файл.</div>';
+            return;
+        }
+        let html = '<table><thead><tr><th>ФИО</th><th>Класс</th><th>Информатика</th><th>Физика</th><th>Математика</th><th>Литература</th></tr></thead><tbody>';
+        students.forEach(s => {
+            html += `<tr>
+                        <td>${s.fio}</td>
+                        <td>${s.class}</td>
+                        <td>${s.informatics}</td>
+                        <td>${s.physics}</td>
+                        <td>${s.mathematics}</td>
+                        <td>${s.literature}</td>
+                     </tr>`;
+        });
+        html += '</tbody></table>';
+        document.getElementById("previewTable").innerHTML = html;
     }
 
     function renderEdit() {
@@ -318,6 +348,7 @@
         students.push({fio, class: cls, informatics: inf, physics: phys, mathematics: math, literature: lit});
         saveData();
         clearFormAndSelection();
+        renderPreview();
         renderEdit();
         renderStats();
         drawChart();
@@ -338,6 +369,7 @@
         };
         saveData();
         clearFormAndSelection();
+        renderPreview();
         renderEdit();
         renderStats();
         drawChart();
@@ -350,6 +382,7 @@
         selectedIndex = null;
         saveData();
         clearFormAndSelection();
+        renderPreview();
         renderEdit();
         renderStats();
         drawChart();
@@ -501,6 +534,7 @@
 
     function parseData(lines) {
         let newStudents = [];
+        // Пропускаем заголовок (первая строка)
         for (let i = 1; i < lines.length; i++) {
             let parts = lines[i].split(';');
             if (parts.length < 6) continue;
@@ -508,28 +542,38 @@
             let cls = parts[1]?.trim();
             let inf = parseInt(parts[2]);
             let phys = parseInt(parts[3]);
+            // Поддержка обоих вариантов: mathemathics (с ошибкой) и mathematics
             let math = parseInt(parts[4]);
             let lit = parseInt(parts[5]);
             if (fio && cls && !isNaN(inf) && !isNaN(phys) && !isNaN(math) && !isNaN(lit)) {
-                newStudents.push({fio, class: cls, informatics: inf, physics: phys, mathematics: math, literature: lit});
+                newStudents.push({
+                    fio, 
+                    class: cls, 
+                    informatics: inf, 
+                    physics: phys, 
+                    mathematics: math, 
+                    literature: lit
+                });
             }
         }
         if (newStudents.length) {
             students = newStudents;
             saveData();
             selectedIndex = null;
+            renderPreview();
             renderEdit();
             renderStats();
             drawChart();
             document.getElementById("uploadMessage").innerHTML = '<div class="success-msg">Загружено ' + students.length + ' учеников</div>';
             setTimeout(() => { document.getElementById("uploadMessage").innerHTML = ''; }, 3000);
         } else {
-            alert("Не удалось найти данные. Проверьте формат (разделитель ; и столбцы: fio;class;informatics;physics;mathematics;literature)");
+            alert("Не удалось найти данные. Проверьте формат (разделитель ; и столбцы: fio;class;informatics;physics;mathemathics;literature)");
         }
     }
 
     function init() {
         loadData();
+        renderPreview();
         renderEdit();
         renderStats();
         drawChart();
