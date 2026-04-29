@@ -41,13 +41,14 @@
         <div class="tab" onclick="openTab(5)">О программе</div>
     </div>
 
+    <!-- Загрузка -->
     <div id="tab0" class="content active">
         <h2>Загрузка оценок</h2>
         <input type="file" id="fileInput" accept=".csv,.txt,.xlsx">
-        <button onclick="loadExample()">Пример</button>
-        <div style="overflow-x:auto"><table id="previewTable"><tr><th>Нет данных</th></tr></table></div>
+        <div style="overflow-x:auto; margin-top:15px"><table id="previewTable"><tr><th>Нет данных</th></table></div>
     </div>
 
+    <!-- Редактирование -->
     <div id="tab1" class="content">
         <h2>Редактирование журнала</h2>
         <div class="card">
@@ -66,19 +67,22 @@
             <select id="editSelect" style="width:250px" onchange="loadEdit()"></select>
             <button onclick="editStudent()">Редактировать</button>
         </div>
-        <div style="overflow-x:auto"><table id="editTable"><tr><th>Нет данных</th></tr></table></div>
+        <div style="overflow-x:auto"><table id="editTable"><tr><th>Нет данных</th></tr></div>
     </div>
 
+    <!-- Статистика -->
     <div id="tab2" class="content">
         <h2>Статистика</h2>
         <div id="statBlock"></div>
     </div>
 
+    <!-- Графики -->
     <div id="tab3" class="content">
         <h2>Графики</h2>
         <div id="chartBlock"></div>
     </div>
 
+    <!-- Помощь -->
     <div id="tab4" class="content">
         <h2>Помощь</h2>
         <div class="card">
@@ -89,12 +93,13 @@
         </div>
     </div>
 
+    <!-- О программе -->
     <div id="tab5" class="content">
         <h2>О программе</h2>
         <div class="card">
             <div class="flex">
-                <div class="photo">ИИ</div>
-                <div><b>Иванов Иван Алексеевич</b><br>Email: ivanov@edu.ru<br>Тел: +7 (999) 123-45-67</div>
+                <div class="photo">АВ</div>
+                <div><b>Алексеева Виктория Дмитриевна</b><br>Email: alexeeva@edu.ru<br>Тел: +7 (999) 123-45-67</div>
             </div>
         </div>
     </div>
@@ -117,28 +122,7 @@ function openTab(n) {
     if(n==3) renderCharts();
 }
 
-function loadExample() {
-    students = [
-        {fio:"Копылов Игорь Максимович",class:"10а",inf:5,phy:5,math:5,lit:5,mus:5},
-        {fio:"Сидорова Эмилия Максимовна",class:"10а",inf:3,phy:4,math:3,lit:5,mus:3},
-        {fio:"Осипова Диана Артёмовна",class:"10а",inf:4,phy:3,math:3,lit:5,mus:3},
-        {fio:"Комиссарова Виктория Савельевна",class:"10а",inf:3,phy:4,math:3,lit:4,mus:3},
-        {fio:"Зуев Мирон Романович",class:"10а",inf:4,phy:4,math:4,lit:4,mus:4},
-        {fio:"Сотникова Миша Богдановна",class:"10б",inf:3,phy:3,math:3,lit:3,mus:3},
-        {fio:"Русаков Дмитрий Владимирович",class:"10б",inf:2,phy:4,math:4,lit:3,mus:3},
-        {fio:"Иванова София Максимовна",class:"10б",inf:4,phy:4,math:4,lit:4,mus:4},
-        {fio:"Антонова Полина Данииловна",class:"10б",inf:3,phy:3,math:3,lit:3,mus:3},
-        {fio:"Фомин Леонид Родионович",class:"10б",inf:4,phy:5,math:5,lit:4,mus:4},
-        {fio:"Лапина Анна Тимофеевна",class:"10б",inf:5,phy:5,math:5,lit:5,mus:5},
-        {fio:"Соколов Александр Артёмович",class:"10в",inf:5,phy:5,math:5,lit:5,mus:5},
-        {fio:"Соколов Артемий Богданович",class:"10в",inf:3,phy:3,math:3,lit:3,mus:3},
-        {fio:"Романов Данил Михайлович",class:"10в",inf:5,phy:5,math:5,lit:5,mus:5},
-        {fio:"Вишневская Мария Сергеевна",class:"10в",inf:5,phy:5,math:5,lit:5,mus:5},
-        {fio:"Давыдов Степан Викторович",class:"10в",inf:2,phy:4,math:4,lit:3,mus:3}
-    ];
-    refresh();
-}
-
+// Загрузка файла
 document.getElementById('fileInput').addEventListener('change', function(e) {
     let file = e.target.files[0];
     if(!file) return;
@@ -149,12 +133,8 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
         for(let i=1; i<lines.length; i++) {
             let c = lines[i].split(';');
             if(c.length>=7 && c[0]) {
-                let fio = c[0].trim().replace(/[ЉЋЌЂЃЏЅ€]/g, function(m) {
-                    let map = {'Љ':'К','Ћ':'Ћ','Ќ':'К','Ђ':'Б','Ѓ':'Г','Џ':'П','Ѕ':'З','€':'Е'};
-                    return map[m] || '?';
-                });
                 arr.push({
-                    fio: fio,
+                    fio: c[0].trim(),
                     class: c[1].trim(),
                     inf: parseInt(c[2])||3,
                     phy: parseInt(c[3])||3,
@@ -165,7 +145,7 @@ document.getElementById('fileInput').addEventListener('change', function(e) {
             }
         }
         if(arr.length) { students = arr; refresh(); }
-        else alert("Ошибка чтения файла. Используйте кнопку Пример");
+        else alert("Ошибка чтения файла. Формат: ФИО;Класс;Информатика;Физика;Математика;Литература;Музыка");
     };
     r.readAsText(file,'utf-8');
 });
@@ -256,7 +236,7 @@ function renderStat() {
         let avg = (sum/grades.length).toFixed(2);
         let med = getMedian(grades);
         let cnt = {2:0,3:0,4:0,5:0};
-        for(let g of grades) if(g>=2 && g<=5) cnt[g]++;
+        for(let g of grades) cnt[g]++;
         html += `<div class="stat-card">
             <h3>${names[idx]}</h3>
             <p>Средняя: ${avg} | Медиана: ${med} | Всего: ${grades.length}</p>
@@ -284,7 +264,7 @@ function renderCharts() {
         for(let s of students) grades.push(s[subs[idx]]);
         if(grades.length==0) continue;
         let cnt = {2:0,3:0,4:0,5:0};
-        for(let g of grades) if(g>=2 && g<=5) cnt[g]++;
+        for(let g of grades) cnt[g]++;
         let canvasId = 'c' + idx;
         let div = document.createElement('div');
         div.className = 'card';
@@ -302,7 +282,6 @@ function renderCharts() {
 }
 
 function refresh() { renderTables(); renderStat(); renderCharts(); }
-loadExample();
 </script>
 </body>
 </html>
